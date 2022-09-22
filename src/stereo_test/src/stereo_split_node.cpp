@@ -102,7 +102,7 @@ void imageCallback(const sensor_msgs::msg::Image::ConstPtr& msg)
         // Publish.
         cv_bridge::CvImage cvImage;
         //Used to be a pointer
-        sensor_msgs::msg::Image::Ptr& img;
+        //sensor_msgs::msg::Image::SharedPtr& img;
         cvImage.encoding = msg->encoding;
         cvImage.header.frame_id = msg->header.frame_id;
         cvImage.header.stamp = msg->header.stamp;
@@ -110,7 +110,7 @@ void imageCallback(const sensor_msgs::msg::Image::ConstPtr& msg)
             || leftCameraInfoPublisher.get_subscription_count() > 0)
         {
             cvImage.image = use_scaled ? leftScaled : leftImage;
-            img = cvImage.toImageMsg();
+            auto img = cvImage.toImageMsg();
             leftImagePublisher.publish(img);
             leftCameraInfoMsg.header.stamp = img->header.stamp;
             leftCameraInfoMsg.header.frame_id = img->header.frame_id;
@@ -120,7 +120,7 @@ void imageCallback(const sensor_msgs::msg::Image::ConstPtr& msg)
             || rightCameraInfoPublisher.get_subscription_count() > 0)
         {
             cvImage.image = use_scaled ? rightScaled : rightImage;
-            img = cvImage.toImageMsg();
+            auto img = cvImage.toImageMsg();
             rightImagePublisher.publish(img);
             rightCameraInfoMsg.header.stamp = img->header.stamp;
             rightCameraInfoMsg.header.frame_id = img->header.frame_id;
@@ -134,8 +134,8 @@ int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
     auto node_main = rclcpp::Node::make_shared("stereo_splitter_main");
-    auto node_left = rclcpp::Node::make_shared(node_main,"left");
-    auto node_right = rclcpp::Node::make_shared(node_main,"right");
+    auto node_left = node_main.get()->create_sub_node("left").get();
+    auto node_right = node_main.get()->create_sub_node("right").get();
     //auto node_main = rclcpp::Node("sxs_stereo");
     //auto node_main_left = rclcpp::Node::image_transport(node_main,"left");
    // auto node_main_right = rclcpp::Node::image_transport(node_main,"right");
@@ -147,8 +147,8 @@ int main(int argc, char** argv)
 
     // Allocate and initialize camera info managers.
     //new camera_info_manager::CameraInfoManager::CameraInfoManager(node_left,"left camera","");
-    camera_info_manager::CameraInfoManager* cry = new camera_info_manager::CameraInfoManager(node_left,"camera","");
-    right_cinfo_ = new camera_info_manager::CameraInfoManager(node_right);
+    left_cinfo_ = new camera_info_manager::CameraInfoManager(node_left);
+    right_cinfo_ = new  camera_info_manager::CameraInfoManager(node_right);
     left_cinfo_->loadCameraInfo("");
     right_cinfo_->loadCameraInfo("");
 
@@ -159,27 +159,26 @@ int main(int argc, char** argv)
     // Load node settings.
     std::string inputImageTopic, leftOutputImageTopic, rightOutputImageTopic,
         leftCameraInfoTopic, rightCameraInfoTopic;
-    node_main.param("input_image_topic", inputImageTopic, 
-        std::string("input_image_topic_not_set"));
-    RCLCPP_INFO(node_main->get_logger(),"input topic to stereo splitter=%s\n", inputImageTopic.c_str());
-    node_main.param("left_output_image_topic", leftOutputImageTopic,
-        std::string("/sxs_stereo/left/image_raw"));
-    node_main.param("right_output_image_topic", rightOutputImageTopic,
-        std::string("/sxs_stereo/right/image_raw"));
-    node_main.param("left_camera_info_topic", leftCameraInfoTopic,
-        std::string("/sxs_stereo/left/camera_info"));
-    node_main.param("right_camera_info_topic", rightCameraInfoTopic,
-        std::string("/sxs_stereo/right/camera_info"));
-    node_main.param("output_width", outputWidth, 0);  // 0 -> use 1/2 input width.
-    node_main.param("output_height", outputHeight, 0);  // 0 -> use input height.
 
+    //TODO: add namespace thingy for /stereo
+    
+    // should use declare_parameters probably
+    inputImageTopic = (*node_main).get_parameter("input_image_topic","input_image_topic_not_set");
+    leftOutputImageTopic = (*node_main).get_parameter("left_output_image_topic","/stereo/left/image_raw");
+    rightOutputImageTopic = (*node_main).get_parameter("right_output_image_topic","/stereo/right/image_raw");
+    leftCameraInfoTopic = (*node_main).get_parameter("left_camera_info_topic","/stereo/left/camera_info");
+    rightCameraInfoTopic = (*node_main).get_parameter("right_camera_info_topic","/stereo/right/camera_info");
+    outputWidth = (*node_main).get_parameter("output_width","0");
+    outputHeight = (*node_main).get_parameter("output_height","0");
+
+    RCLCPP_INFO(node_main->get_logger(),"input topic to stereo splitter=%s\n", inputImageTopic.c_str());
 
     // Register publishers and subscriber.
-    imageSub = node_main.subsciption(inputImageTopic.c_str(), 2, &imageCallback);
+    auto leftCameraInfoPublisher = node_left->create_publisher<sensor_msgs::msg::CameraInfo>(leftCameraInfoTopic.c_str(), rclcpp::SensorDataQoS()).get();
+    auto rightCameraInfoPublisher = node_right->create_publisher<sensor_msgs::msg::CameraInfo>(rightCameraInfoTopic.c_str(), rclcpp::SensorDataQoS()).get();
+    imageSub = it.subscribe(inputImageTopic.c_str(), 2, &imageCallback);
     leftImagePublisher = it.advertise(leftOutputImageTopic.c_str(), 1);
     rightImagePublisher = it.advertise(rightOutputImageTopic.c_str(), 1);
-    leftCameraInfoPublisher = node_left.advertise<sensor_msgs::msg::CameraInfo>(leftCameraInfoTopic.c_str(), 1, true);
-    rightCameraInfoPublisher = node_right.advertise<sensor_msgs::msg::CameraInfo>(rightCameraInfoTopic.c_str(), 1, true);
 
     // Run node until cancelled.
     rclcpp::spin_some(node_main);
