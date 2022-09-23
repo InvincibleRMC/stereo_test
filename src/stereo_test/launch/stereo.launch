@@ -1,15 +1,19 @@
 <launch>
+
+    
     <node pkg="usb_cam" exec="usb_cam_node_exe" name="stereo_cam">
-    <param name="video_device" value="/dev/video2"/>
-    <!-- Needed for our stereo cam-->
-    <param name="pixel_format" value="mjpeg"/>
-    <param name="image_width" value="2560"/>
-    <param name="image_height" value="960"/>
+        <param name="video_device" value="/dev/video0"/>
+        <!-- Needed for our stereo cam-->
+        <param name="pixel_format" value="mjpeg"/>
+        <param name="image_width" value="2560"/>
+        <param name="image_height" value="960"/>
     </node>
     
     <node pkg="rviz2" exec="rviz2" name="rviz"/>
-
-    <node pkg="stereo" node="stereo_split_node" name="stereo_split">
-
+    
+    <node pkg="stereo_test" exec="stereo_split_node" name="stereo_split">
+        <param name="input_image_topic" value="/image_raw"/>
+    </node>
+    
 </launch>
 

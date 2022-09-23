@@ -17,11 +17,11 @@ find_package(std_msgs REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable(stereo_split src/stereo_test/src/stereo_split_node.cpp)
-ament_target_dependencies(stereo_split rclcpp cv_bridge image_transport camera_info_manager sensor_msgs std_msgs) 
+add_executable(stereo_split_node src/stereo_test/src/stereo_split_node.cpp)
+ament_target_dependencies(stereo_split_node rclcpp cv_bridge image_transport camera_info_manager sensor_msgs std_msgs) 
 
 install(TARGETS
-stereo_split
+stereo_split_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
