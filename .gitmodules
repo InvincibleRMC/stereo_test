@@ -1,0 +1,4 @@
+[submodule "image_pipeline"]
+	path = src/image_pipeline
+	url = git@github.com:ros-perception/image_pipeline.git
+	branch = galactic
