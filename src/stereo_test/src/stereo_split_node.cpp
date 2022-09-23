@@ -57,6 +57,8 @@ image_transport::Subscriber imageSub;
 image_transport::Publisher leftImagePublisher, rightImagePublisher;
 
 // Left and right camera info publishers and messages.
+// https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Developer-Guide.html#general-principles
+//apparently shouldn't do this lmao
 std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::CameraInfo>> leftCameraInfoPublisher, rightCameraInfoPublisher;
 sensor_msgs::msg::CameraInfo leftCameraInfoMsg, rightCameraInfoMsg;
 

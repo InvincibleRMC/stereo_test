@@ -28,7 +28,7 @@
            <node pkg="stereo_image_proc" exec="point_cloud_node" name="stereo_pointcloud"/>
    <include file="stereo_image_proc.launch.py"/>
         -->
-        <include file="$(find-pkg-share stereo_image_proc)/launch/stereo_image_proc.launch.py"/>
+        <include file="$(find)/../../src/image_pipeline/stereo_image_proc/launch/stereo_image_proc.launch.py"/>
   
     
 </launch>
