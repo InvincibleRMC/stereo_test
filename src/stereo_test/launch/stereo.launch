@@ -1,6 +1,8 @@
 <launch>
-
-    
+    <!--
+        half following this
+    https://jeffzzq.medium.com/ros2-image-pipeline-tutorial-3b18903e7329
+    -->
     <node pkg="usb_cam" exec="usb_cam_node_exe" name="stereo_cam">
         <param name="video_device" value="/dev/video0"/>
         <!-- Needed for our stereo cam-->
@@ -14,6 +16,20 @@
     <node pkg="stereo_test" exec="stereo_split_node" name="stereo_split">
         <param name="input_image_topic" value="/image_raw"/>
     </node>
+    <push-ros-namespace namespace="stereo"/>
+   
+
+    <!--
+        todo update dependecy
+          <node pkg="image_view" exec="disparity_view" name="disparity_view"/>
+          
+           <node pkg="stereo_image_proc" exec="disparity_node" name="stereo_disparity"/>
+
+           <node pkg="stereo_image_proc" exec="point_cloud_node" name="stereo_pointcloud"/>
+   
+        -->
+        
+  <include file="stereo_image_proc.launch.py"/>
     
 </launch>
 
