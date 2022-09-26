@@ -2,3 +2,7 @@
 	path = src/image_pipeline
 	url = git@github.com:ros-perception/image_pipeline.git
 	branch = galactic
+[submodule "vision_opencv"]
+	path = src/vision_opencv
+	url = git@github.com:ros-perception/vision_opencv.git
+	branch = galactic

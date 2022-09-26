@@ -19,7 +19,7 @@ install(DIRECTORY src/${PROJECT_NAME}/launch DESTINATION share/${PROJECT_NAME}/)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
   # Add C++ excuteable nodes
-add_executable(stereo_split_node src/stereo_test/src/stereo_split_node.cpp)
+add_executable(stereo_split_node /src/stereo_split_node.cpp)
 ament_target_dependencies(stereo_split_node rclcpp cv_bridge image_transport camera_info_manager sensor_msgs std_msgs) 
 
 install(TARGETS

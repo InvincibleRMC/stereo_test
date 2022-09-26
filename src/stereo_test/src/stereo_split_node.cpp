@@ -58,7 +58,7 @@ image_transport::Publisher leftImagePublisher, rightImagePublisher;
 
 // Left and right camera info publishers and messages.
 // https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Developer-Guide.html#general-principles
-//apparently shouldn't do this lmao
+//apparently shouldn't do this
 std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::CameraInfo>> leftCameraInfoPublisher, rightCameraInfoPublisher;
 sensor_msgs::msg::CameraInfo leftCameraInfoMsg, rightCameraInfoMsg;
 
@@ -149,11 +149,11 @@ int main(int argc, char** argv)
     //rclcpp::NodeHandle node_main__left(node_main_, "left");
     //rclcpp::NodeHandle node_main__right(node_main_, "right");
 
-    RCLCPP_INFO(node_main_->get_logger(),"made nodes");
+    //RCLCPP_INFO(node_main_->get_logger(),"made nodes");
 
     image_transport::ImageTransport it(node_main_);
 
-    RCLCPP_INFO(node_main_->get_logger(),"image transport");
+    //RCLCPP_INFO(node_main_->get_logger(),"image transport");
 
     // Allocate and initialize camera info managers.
     //new camera_info_manager::CameraInfoManager::CameraInfoManager(node_left_,"left camera","");
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
     outputWidth = (*node_main_).declare_parameter("output_width",0);
     outputHeight = (*node_main_).declare_parameter("output_height",0);
 
-    RCLCPP_INFO(node_main_->get_logger(),"declared params");
+    //RCLCPP_INFO(node_main_->get_logger(),"declared params");
 
     RCLCPP_INFO(node_main_->get_logger(),"input topic to stereo splitter=%s\n", inputImageTopic.c_str());
 
@@ -195,7 +195,7 @@ int main(int argc, char** argv)
     leftImagePublisher = it.advertise(leftOutputImageTopic.c_str(), 1);
     rightImagePublisher = it.advertise(rightOutputImageTopic.c_str(), 1);
 
-    RCLCPP_INFO(node_main_->get_logger(),"pubs and subs");
+    //RCLCPP_INFO(node_main_->get_logger(),"pubs and subs");
 
     // Run node until cancelled.
     rclcpp::spin(node_main_);
